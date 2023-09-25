@@ -9,16 +9,30 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:home-outline'
     },
     {
-      title: 'Second Page',
-      path: '/second-page',
-      icon: 'mdi:email-outline'
-    },
-    {
-      path: '/acl',
-      action: 'read',
-      subject: 'acl-page',
-      title: 'Access Control',
-      icon: 'mdi:shield-outline'
+      icon: 'mdi:home-outline',
+      title: 'Software',
+      children: [
+        {
+          icon: 'mdi:chart-donut',
+          title: 'Computer software types',
+          path: '/software/computerSoftwareType'
+        },
+        {
+          icon: 'mdi:chart-donut',
+          title: 'Software sub types',
+          path: '/software/softwareSubType'
+        },
+        {
+          icon: 'mdi:chart-donut',
+          title: 'Software types',
+          path: '/software/softwareType'
+        },
+        {
+          icon: 'mdi:chart-donut',
+          title: 'Softwares',
+          path: '/software/software'
+        }
+      ]
     }
   ]
 }

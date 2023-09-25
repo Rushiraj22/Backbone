@@ -9,22 +9,20 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 import { useSettings } from "src/@core/hooks/useSettings";
 import FooterIllustrationsV2 from "src/views/pages/auth/FooterIllustrationsV2";
 import InputText from "src/@core/components/libs/ui/inputText/inputText";
-import OutlinedInputPassword from "src/@core/components/libs/ui/passworContainer/outlinedInput";
 import CustomTypography from "src/@core/components/libs/ui/typography/typography";
-import BoxComponent from "src/@core/components/libs/ui/muiBox/muiBox";
-import MUIButton from "src/@core/components/libs/ui/button/button";
-import MUIDivider from "src/@core/components/libs/ui/divider/divider";
-import MUIIconButton from "src/@core/components/libs/ui/iconButton/iconButton";
 import CircularProgressComponent from "src/@core/components/libs/ui/CircularProgress/CircularProgress";
-import { isValidEmail } from "src/utils/helper";
-import MUICheckbox from "src/@core/components/libs/ui/checkbox/checkbox";
-import MUIFormControl from "src/@core/components/libs/ui/formControl/formControl";
-import { RegisterUser, getLoadingState } from "src/redux/reducers/authReducer";
+import MUIButton from "src/@core/components/libs/ui/button/button";
+import BoxComponent from "src/@core/components/libs/ui/muiBox/muiBox";
+import { ChangePassword, getLoadingState } from "src/redux/reducers/authReducer";
+import OutlinedInputPassword from "src/@core/components/libs/ui/passworContainer/outlinedInput";
+import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "src/redux/app/Store";
 
-// ** Styled Components
-const RegisterIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
+/**
+ * Styled Components
+ */
+const ForgotPasswordIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   padding: theme.spacing(20),
   paddingRight: "0 !important",
   [theme.breakpoints.down("lg")]: {
@@ -32,23 +30,23 @@ const RegisterIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   }
 }));
 
-const RegisterIllustration = styled("img")(({ theme }) => ({
+const ForgotPasswordIllustration = styled("img")(({ theme }) => ({
   maxWidth: "48rem",
   [theme.breakpoints.down("xl")]: {
-    maxWidth: "38rem"
+    maxWidth: "38rem",
   },
   [theme.breakpoints.down("lg")]: {
-    maxWidth: "30rem"
+    maxWidth: "30rem",
   }
 }));
 
 const RightWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   width: "100%",
   [theme.breakpoints.up("md")]: {
-    maxWidth: 400
+    maxWidth: 400,
   },
   [theme.breakpoints.up("lg")]: {
-    maxWidth: 450
+    maxWidth: 450,
   }
 }));
 
@@ -60,63 +58,49 @@ const BoxWrapper = styled(Box)<BoxProps>(({ theme }) => ({
 }));
 
 const LinkStyled = styled(Link)(({ theme }) => ({
+  display: "flex",
+  "& svg": { mr: 1.5 },
+  alignItems: "center",
   textDecoration: "none",
+  justifyContent: "center",
   color: theme.palette.primary.main
 }));
 
 interface FormValues {
-  username: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string | number;
-  password: string | number | any;
-  confirm_password: string | number | any;
+  otp: number | string;
+  new_password: string;
+  confirm_password: string;
 };
 
-const Register = () => {
+const ForgotPassword = () => {
   /**
    * Hooks
    */
   const theme = useTheme();
   const { settings } = useSettings();
   const dispatch = useDispatch<AppDispatch>();
-  const hidden = useMediaQuery(theme.breakpoints.down("md"));
+
+  const router = useRouter();
+  const { uuid } = router?.query;
 
   /**
    * Vars
    */
   const { skin } = settings;
+  const hidden = useMediaQuery(theme.breakpoints.down("md"));
 
-  const imageSource = skin === "bordered" ? "auth-v2-register-illustration-bordered" : "auth-v2-register-illustration";
+  const imageSource = skin === "bordered" ? "auth-v2-forgot-password-illustration-bordered" : "auth-v2-forgot-password-illustration";
 
   const defaultValues = {
-    username: "",
-    first_name: "",
-    last_name: "",
-    email: "",
-    phone: "",
-    password: "",
+    otp: "",
+    new_password: "",
     confirm_password: ""
   };
 
   /**
-   * Form fields
+   * Form values
    */
   const [inputValues, setInputValues] = useState<FormValues>(defaultValues);
-
-  /**
-   * Form Error
-   */
-  const [errors, setErrors] = useState({
-    username: "",
-    first_name: "",
-    last_name: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirm_password: ""
-  });
 
   /**
    * get Loading state
@@ -128,6 +112,14 @@ const Register = () => {
     setIsLoading(isLoadingState)
   }, [isLoadingState]);
 
+  /**
+   * Form Error
+   */
+  const [errors, setErrors] = useState({
+    otp: "",
+    new_password: "",
+    confirm_password: ""
+  });
 
   /**
    * Validation function
@@ -137,42 +129,13 @@ const Register = () => {
    */
   const validateForm = (name: any, value: any) => {
     switch (name) {
-      case "username":
+      case "otp":
         if (!value || value.trim() === "") {
-          return "Username is required.";
+          return "Otp is required.";
         } else {
           return "";
         }
-      case "first_name":
-        if (!value || value.trim() === "") {
-          return "First name is required.";
-        } else {
-          return "";
-        }
-      case "last_name":
-        if (!value || value.trim() === "") {
-          return "Last name is required.";
-        } else {
-          return "";
-        }
-      case "email":
-        if (!value || value.trim() === "") {
-          return "Email is required.";
-        }
-        if (!isValidEmail(value)) {
-          return "Please enter valid email address.";
-        }
-        else {
-          return "";
-        }
-      case "phone":
-        if (!value || value.trim() === "") {
-          return "Phone number is required.";
-        } else {
-          return "";
-        }
-
-      case "password":
+      case "new_password":
         if (!value || value.trim() === "") {
           return "Password is required.";
         }
@@ -190,12 +153,11 @@ const Register = () => {
         if (!value) {
           return "Confirm password is required.";
         }
-        if (inputValues.confirm_password && value !== inputValues.password) {
+        if (inputValues.confirm_password && value !== inputValues.new_password) {
           return "Password and Confirm Password does not match.";
         } else {
           return "";
         }
-
       default: {
         return "";
       }
@@ -211,7 +173,7 @@ const Register = () => {
     event.preventDefault();
     const validationErrors: { [key: string]: string } = {};
     Object.keys(inputValues).forEach((name: string) => {
-      const error: string | undefined = validateForm(name, inputValues[name as keyof typeof inputValues]);
+      const error: string = validateForm(name, inputValues[name as keyof typeof inputValues]);
       if (error && error.length > 0) {
         validationErrors[name] = error;
       }
@@ -223,10 +185,10 @@ const Register = () => {
     }
 
     /**
-     * Passed inputValues for RegisterUser function
+     * Passed inputValues for ChangePassword function
      */
-    dispatch(RegisterUser(inputValues));
-  };
+    dispatch(ChangePassword({ inputValues, uuid }));
+  }
 
   /**
    * OnChange event
@@ -234,25 +196,28 @@ const Register = () => {
    */
   const handleOnChange = (event: any) => {
     const { name } = event.target;
-    const value = event.target.name === "agree" ? event.target.checked : event.target.value.toString();
+    const value = event.target.value;
 
     setErrors({ ...errors, [name]: validateForm(name, value) });
     setInputValues({ ...inputValues, [name]: value });
-  };
+  }
 
   return (
     <BoxComponent className="content-right">
-      {!hidden ? (
-        <BoxComponent sx={{ flex: 1, display: "flex", position: "relative", alignItems: "center", justifyContent: "center" }}>
-          <RegisterIllustrationWrapper>
-            <RegisterIllustration
-              alt="register-illustration"
-              src={`/images/pages/${imageSource}-${theme.palette.mode}.png`}
-            />
-          </RegisterIllustrationWrapper>
-          <FooterIllustrationsV2 image={`/images/pages/auth-v2-register-mask-${theme.palette.mode}.png`} />
-        </BoxComponent>
-      ) : null}
+      {
+        !hidden ? (
+          <BoxComponent sx={{ flex: 1, display: "flex", position: "relative", alignItems: "center", justifyContent: "center" }}>
+            <ForgotPasswordIllustrationWrapper>
+              <ForgotPasswordIllustration
+                alt="forgot-password-illustration"
+                src={`/images/pages/${imageSource}-${theme.palette.mode}.png`}
+              />
+            </ForgotPasswordIllustrationWrapper>
+            <FooterIllustrationsV2 image={`/images/pages/auth-v2-forgot-password-mask-${theme.palette.mode}.png`} />
+          </BoxComponent>
+        )
+          : null
+      }
       <RightWrapper sx={skin === "bordered" && !hidden ? { borderLeft: `1px solid ${theme.palette.divider}` } : {}}>
         <BoxComponent
           sx={{
@@ -338,7 +303,7 @@ const Register = () => {
                     x2="25.1443"
                     y2="143.953"
                     id="paint1_linear_7821_79167"
-                    gradientUnits="userSpaceOnUse"
+                    gradientUnits='userSpaceOnUse'
                   >
                     <stop />
                     <stop offset="1" stopOpacity="0" />
@@ -349,98 +314,40 @@ const Register = () => {
                 {themeConfig.templateName}
               </CustomTypography>
             </BoxComponent>
-            <BoxComponent sx={{ mb: 6, textAlign: "center" }}>
+            <BoxComponent sx={{ mb: 6 }}>
               <CustomTypography
-                variant="h5"
                 sx={{
                   fontWeight: 600,
                   letterSpacing: "0.18px",
                   marginBottom: theme.spacing(1.5),
                   [theme.breakpoints.down("md")]: { marginTop: theme.spacing(8) }
-                }}
-              >
-                Create User Account 🚀
+                }} variant="h5">
+                Change Password
               </CustomTypography>
             </BoxComponent>
             <form noValidate autoComplete="off" onSubmit={handleSubmit}>
               <InputText
+                size="medium"
+                label="Otp"
+                name="otp"
                 type="text"
-                size="medium"
-                label="Username"
-                name="username"
                 variant="outlined"
-                placeholder="username"
-                id="username"
+                placeholder="Otp"
+                id="otp"
                 onChange={handleOnChange}
-                value={inputValues.username}
-                errorMessage={errors.username}
-                error={errors.username ? true : false}
-                disabled={false}
-              />
-              <InputText
-                type="text"
-                size="medium"
-                label="First name"
-                name="first_name"
-                variant="outlined"
-                placeholder="First name"
-                id="first_name"
-                onChange={handleOnChange}
-                value={inputValues.first_name}
-                errorMessage={errors.first_name}
-                error={errors.first_name ? true : false}
-                disabled={false}
-              />
-              <InputText
-                type="text"
-                size="medium"
-                label="Last name"
-                name="last_name"
-                variant="outlined"
-                placeholder="Last name"
-                id="last_name"
-                onChange={handleOnChange}
-                value={inputValues.last_name}
-                errorMessage={errors.last_name}
-                error={errors.last_name ? true : false}
-                disabled={false}
-              />
-              <InputText
-                size="medium"
-                label="Email"
-                name="email"
-                variant="outlined"
-                placeholder="Email"
-                id="email"
-                onChange={handleOnChange}
-                value={inputValues.email}
-                type="text"
-                errorMessage={errors.email}
-                error={errors.email ? true : false}
-                disabled={false}
-              />
-              <InputText
-                type="number"
-                size="medium"
-                label="Mobile"
-                name="phone"
-                variant="outlined"
-                placeholder="Mobile"
-                id="phone"
-                onChange={handleOnChange}
-                value={inputValues.phone}
-                errorMessage={errors.phone}
-                error={errors.phone ? true : false}
+                value={inputValues.otp}
+                errorMessage={errors.otp}
+                error={errors.otp ? true : false}
                 disabled={false}
               />
               <OutlinedInputPassword
-                name="password"
+                name="new_password"
                 label="Password"
-                value={inputValues.password}
+                value={inputValues.new_password}
                 onChange={handleOnChange}
                 placeholder="Password"
-                error={errors.password ? true : false}
-                errorMessage={errors.password}
+                error={errors.new_password ? true : false}
+                errorMessage={errors.new_password}
               />
               <OutlinedInputPassword
                 name="confirm_password"
@@ -451,83 +358,34 @@ const Register = () => {
                 error={errors.confirm_password ? true : false}
                 errorMessage={errors.confirm_password}
               />
-              <MUIFormControl sx={{ mb: 2 }} size={undefined}>
-                <MUICheckbox
-                  name="agree"
-                  sx={{ height: "30px", "& .MuiFormControlLabel-label": { fontSize: "0.875rem" } }}
-                  label={<LinkStyled href="/" onClick={e => e.preventDefault()}>
-                    privacy policy & terms
-                  </LinkStyled>
-                  }
-                />
-              </MUIFormControl>
               <MUIButton
                 fullWidth
                 variant="contained"
                 color="primary"
-                title={isLoading ? "Loading..." : "Sign up"}
+                title={isLoading ? "Loading..." : "Change Password"}
                 size="large"
                 type="submit"
-                sx={{ mb: 7 }}
+                sx={{ mb: 5.25 }}
                 startIcon={isLoading &&
                   <CircularProgressComponent
                     sx={{ color: "white" }} size={20}
                   />}
               />
-              <BoxComponent sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", justifyContent: "center" }}>
-                <CustomTypography sx={{ mr: 2, color: "text.secondary" }}>Already have an account?</CustomTypography>
-                <CustomTypography href="/login" component={Link} sx={{ color: "primary.main", textDecoration: "none" }}>
-                  Sign in instead
-                </CustomTypography>
-              </BoxComponent>
-              <MUIDivider
-                sx={{
-                  "& .MuiDivider-wrapper": { px: 4 },
-                  mt: (theme: any) => `${theme.spacing(5)} !important`,
-                  mb: (theme: any) => `${theme.spacing(7.5)} !important`
-                }}
-                title="or"
-              />
-              <BoxComponent sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <MUIIconButton
-                  href="/"
-                  component={Link}
-                  sx={{ color: "#497ce2" }}
-                  onClick={(e: any) => e.preventDefault()}
-                  icon={<Icon icon="mdi:facebook" />}
-                />
-                <MUIIconButton
-                  href="/"
-                  component={Link}
-                  sx={{ color: "#1da1f2" }}
-                  onClick={(e: any) => e.preventDefault()}
-                  icon={<Icon icon="mdi:twitter" />}
-                />
-                <MUIIconButton
-                  href="/"
-                  component={Link}
-                  onClick={(e: any) => e.preventDefault()}
-                  sx={{ color: (theme: any) => (theme.palette.mode === "light" ? "#272727" : "grey.300") }}
-                  icon={<Icon icon="mdi:github" />}
-                />
-                <MUIIconButton
-                  href="/"
-                  component={Link}
-                  sx={{ color: "#db4437" }}
-                  onClick={(e: any) => e.preventDefault()}
-                  icon={<Icon icon="mdi:google" />}
-                />
-              </BoxComponent>
+              <CustomTypography sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <LinkStyled href="/login">
+                  <Icon icon="mdi:chevron-left" fontSize="2rem" />
+                  <span>Back to login</span>
+                </LinkStyled>
+              </CustomTypography>
             </form>
           </BoxWrapper>
         </BoxComponent>
       </RightWrapper>
     </BoxComponent>
-  );
-};
+  )
+}
 
-Register.getLayout = (page: ReactNode) => <BlankLayout>{page}</BlankLayout>;
+ForgotPassword.guestGuard = true;
+ForgotPassword.getLayout = (page: ReactNode) => <BlankLayout>{page}</BlankLayout>
 
-Register.guestGuard = true;
-
-export default Register;
+export default ForgotPassword;

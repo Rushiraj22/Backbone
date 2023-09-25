@@ -18,6 +18,7 @@ import MUIIconButton from "src/@core/components/libs/ui/iconButton/iconButton";
 import CircularProgressComponent from "src/@core/components/libs/ui/CircularProgress/CircularProgress";
 import InputText from "src/@core/components/libs/ui/inputText/inputText";
 import OutlinedInputPassword from "src/@core/components/libs/ui/passworContainer/outlinedInput";
+import { useAuth } from "src/hooks/useAuth";
 
 const LoginIllustration = styled("img")(({ theme }) => ({
   maxWidth: "45rem",
@@ -47,7 +48,6 @@ const BoxWrapper = styled(Box)<BoxProps>(({ theme }) => ({
 }));
 
 const LoginPage = () => {
-  const { t } = useTranslation();
   const theme = useTheme();
   const hidden = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -56,6 +56,8 @@ const LoginPage = () => {
   const { skin } = settings;
 
   const [rememberMe, setRememberMe] = useState(false);
+
+  const auth = useAuth();
 
   const imageSource = skin === "bordered" ? "auth-v2-login-illustration-bordered" : "auth-v2-login-illustration";
 
@@ -148,7 +150,7 @@ const LoginPage = () => {
     /**
      * Passed inputvalues from API
      */
-    // auth.login(inputValues);
+    auth.login(inputValues);
 
     setIsLoading(true);
     setTimeout(() => {
@@ -207,15 +209,15 @@ const LoginPage = () => {
                   [theme.breakpoints.down("md")]: { marginTop: theme.spacing(8) }
                 }}
               >
-                {`${t("welcome_to_backbone", "Welcome to Backbone! 👋🏻")}`}
+                Welcome to Backbone! 👋🏻
               </CustomTypography>
-              <CustomTypography variant="body2">{`${t("please_signin", "Please sign-in to your account")}`}</CustomTypography>
+              <CustomTypography variant="body2">Please sign-in to your account</CustomTypography>
             </BoxComponent>
             <form noValidate autoComplete="off" onSubmit={handleSubmit}>
               <InputText
                 name="username"
-                label={`${t("username", "Username")}`}
-                placeholder={`${t("username", "Username")}`}
+                label="Username"
+                placeholder="Username"
                 value={inputValues.username}
                 onChange={handleOnChange}
                 error={errors.username ? true : false}
@@ -223,8 +225,8 @@ const LoginPage = () => {
               />
               <OutlinedInputPassword
                 name="password"
-                label={`${t("password", "Password")}`}
-                placeholder={`${t("password", "Password")}`}
+                label="Password"
+                placeholder="Password"
                 value={inputValues.password}
                 onChange={handleOnChange}
                 error={errors.password ? true : false}
@@ -233,20 +235,20 @@ const LoginPage = () => {
               <BoxComponent
                 sx={{ mb: 4, display: "flex", alignItems: "center", flexWrap: "wrap", justifyContent: "space-between" }}
               >
-                <MUICheckbox label={`${t("remember_me", "Remember Me")}`} checked={rememberMe} onChange={(e: any) => setRememberMe(!rememberMe)} />
+                <MUICheckbox label="Remember Me" checked={rememberMe} onChange={(e: any) => setRememberMe(!rememberMe)} />
                 <CustomTypography
                   variant="body2"
                   component={Link}
                   href="/forgot-password"
                   sx={{ color: "primary.main", textDecoration: "none" }}
                 >
-                  {t("forgot_password_question", "Forgot Password?")}
+                  Forgot Password?
                 </CustomTypography>
               </BoxComponent>
               <MUIButton
                 variant="contained"
                 color="primary"
-                title={isLoading ? `${t("loading", "Loading...")}` : `${t("login", "Login")}`}
+                title={isLoading ? "Loading..." : "Login"}
                 fullWidth
                 size="large"
                 type="submit"
@@ -256,9 +258,9 @@ const LoginPage = () => {
                   />}
               />
               <BoxComponent sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", justifyContent: "center" }}>
-                <CustomTypography sx={{ mr: 2, color: "text.secondary" }}>{`${t("new_on_our_platform", "New on our platform?")}`}</CustomTypography>
+                <CustomTypography sx={{ mr: 2, color: "text.secondary" }}>New on our platform?</CustomTypography>
                 <CustomTypography href="/register" component={Link} sx={{ color: "primary.main", textDecoration: "none" }}>
-                  {`${t("create_an_account", "Create an account")}`}
+                  Create an account
                 </CustomTypography>
               </BoxComponent>
               <MUIDivider
@@ -267,7 +269,7 @@ const LoginPage = () => {
                   mt: (theme: any) => `${theme.spacing(5)} !important`,
                   mb: (theme: any) => `${theme.spacing(7.5)} !important`
                 }}
-                title={`${t("or", "or")}`}
+                title="or"
               />
               <BoxComponent sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <MUIIconButton

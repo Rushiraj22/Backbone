@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import Box, { BoxProps } from "@mui/material/Box";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -9,11 +9,15 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 import { useSettings } from "src/@core/hooks/useSettings";
 import FooterIllustrationsV2 from "src/views/pages/auth/FooterIllustrationsV2";
 import InputText from "src/@core/components/libs/ui/inputText/inputText";
-import { useTranslation } from "react-i18next";
 import CustomTypography from "src/@core/components/libs/ui/typography/typography";
 import CircularProgressComponent from "src/@core/components/libs/ui/CircularProgress/CircularProgress";
 import MUIButton from "src/@core/components/libs/ui/button/button";
 import BoxComponent from "src/@core/components/libs/ui/muiBox/muiBox";
+import { isValidEmail } from "src/utils/helper";
+import { ResetPassword, getLoadingState } from "src/redux/reducers/authReducer";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "src/redux/app/Store";
+import { useSelector } from "react-redux";
 
 // Styled Components
 const ForgotPasswordIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -61,41 +65,67 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 }));
 
 interface FormValues {
-  username: any;
+  email: any;
 };
 
 const ForgotPassword = () => {
-  // ** Hooks
+  /**
+   * Hooks
+   */
   const theme = useTheme();
   const { settings } = useSettings();
+  const dispatch = useDispatch<AppDispatch>();
 
-  const { t } = useTranslation();
-
-  // ** Vars
+  /**
+   * Vars
+   */
   const { skin } = settings;
   const hidden = useMediaQuery(theme.breakpoints.down("md"));
 
-  const imageSource =
-    skin === "bordered" ? "auth-v2-forgot-password-illustration-bordered" : "auth-v2-forgot-password-illustration";
+  const imageSource = skin === "bordered" ? "auth-v2-forgot-password-illustration-bordered" : "auth-v2-forgot-password-illustration";
+
   const defaultValues = {
-    username: ""
+    email: ""
   };
 
+  /**
+   * Form values
+   */
   const [inputValues, setInputValues] = useState<FormValues>(defaultValues);
+
+  /**
+   * get Loading state
+   */
+  const isLoadingState = useSelector(getLoadingState);
   const [isLoading, setIsLoading] = useState(false);
 
-  // ** Form Error
+  useEffect(() => {
+    setIsLoading(isLoadingState)
+  }, [isLoadingState]);
+
+  /**
+   * Form Error
+   */
   const [errors, setErrors] = useState({
-    username: ""
+    email: ""
   });
 
-  // ** Validation function
+  /**
+   * Validation function
+   * @param name 
+   * @param value 
+   * @returns 
+   */
   const validateForm = (name: any, value: any) => {
     switch (name) {
-      case "username":
+      case "email":
         if (!value || value.trim() === "") {
-          return "Username is required";
-        } else {
+          return "Email is required.";
+        }
+        if (!isValidEmail(value)) {
+          return "Please enter valid email address.";
+        }
+        else {
           return "";
         }
       default: {
@@ -104,7 +134,12 @@ const ForgotPassword = () => {
     }
   };
 
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  /**
+   * handleSubmit function
+   * @param event 
+   * @returns 
+   */
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const validationErrors: { [key: string]: string } = {};
     Object.keys(inputValues).forEach((name: string) => {
@@ -118,13 +153,16 @@ const ForgotPassword = () => {
 
       return;
     }
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-    // forgotPassword(inputValues);
+
+    /**
+     * Passed inputValues for ResetPassword function
+     */
+    dispatch(ResetPassword(inputValues));
   }
 
+  /**
+   * OnChange event
+   */
   const handleOnChange = (event: any) => {
     const { name } = event.target;
     const value = event.target.value;
@@ -253,32 +291,32 @@ const ForgotPassword = () => {
                   marginBottom: theme.spacing(1.5),
                   [theme.breakpoints.down("md")]: { marginTop: theme.spacing(8) }
                 }} variant="h5">
-                {`${t("forgot_password", "Forgot Password")}🔒`}
+                Forgot Password🔒
               </CustomTypography>
               <CustomTypography variant="body2">
-                {`${t("enter_your_email", "Enter your email and we'll send you instructions to reset your password")}`}
+                Enter your email and we'll send you instructions to reset your password
               </CustomTypography>
             </BoxComponent>
-            <form noValidate autoComplete="off" onSubmit={onSubmit}>
+            <form noValidate autoComplete="off" onSubmit={handleSubmit}>
               <InputText
                 size="medium"
-                label={`${t("username", "Username")}`}
-                name="username"
+                label="Email"
+                name="email"
                 type="text"
                 variant="outlined"
-                placeholder={`${t("username", "Username")}`}
-                id="username"
+                placeholder="Email"
+                id="Email"
                 onChange={handleOnChange}
-                value={inputValues.username}
-                errorMessage={errors.username}
-                error={errors.username ? true : false}
+                value={inputValues.email}
+                errorMessage={errors.email}
+                error={errors.email ? true : false}
                 disabled={false}
               />
               <MUIButton
                 fullWidth
                 variant="contained"
                 color="primary"
-                title={isLoading ? `${t("loading", "Loading...")}` : `${t("send_otp", "Send OTP")}`}
+                title={isLoading ? "Loading..." : "Send OTP"}
                 size="large"
                 type="submit"
                 sx={{ mb: 5.25 }}
@@ -290,7 +328,7 @@ const ForgotPassword = () => {
               <CustomTypography sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <LinkStyled href="/login">
                   <Icon icon="mdi:chevron-left" fontSize="2rem" />
-                  <span>{`${t("back_to_login", "Back to login")}`}</span>
+                  <span>Back to login</span>
                 </LinkStyled>
               </CustomTypography>
             </form>
