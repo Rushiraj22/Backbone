@@ -5,6 +5,7 @@ import { AuthValuesType, LoginParams, UserDataType } from "./types";
 import axiosObj from "src/services/api";
 import { getSignInURL } from "src/services/apiConfig";
 import { TokenBlackList } from "src/redux/reducers/authReducer";
+import { getAccessToken, getLocalRefreshToken, saveAccessToken, saveRefreshToken } from "src/utils/helper";
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -36,7 +37,7 @@ const AuthProvider = ({ children }: Props) => {
 
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
-      const storedToken = window.localStorage.getItem("accessToken")
+      const storedToken = getAccessToken()
       if (storedToken) {
         setLoading(true)
         setLoading(false)
@@ -44,7 +45,7 @@ const AuthProvider = ({ children }: Props) => {
         const roles = userData ? userData : null;
         setUser(roles)
       } else {
-        const myaccessToken = window.localStorage.getItem("accessToken")
+        const myaccessToken = getAccessToken();
         setLoading(false)
         if (!myaccessToken) {
           router.replace("/login")
@@ -60,8 +61,8 @@ const AuthProvider = ({ children }: Props) => {
     axiosObj.post(getSignInURL(), params)
       .then(async response => {
         if (response.status === 200) {
-          localStorage.setItem("accessToken", response.data.access);
-          localStorage.setItem("refreshToken", response.data.refresh);
+          saveAccessToken("accessToken", response.data.access);
+          saveRefreshToken("refreshToken", response.data.refresh)
           localStorage.setItem("userData", "admin");
           localStorage.setItem("user_permissions", response.data.user_permissions)
           const userData = window.localStorage.getItem("userData");
@@ -73,13 +74,13 @@ const AuthProvider = ({ children }: Props) => {
         }
       })
       .catch(err => {
-        console.log(err);
+        throw err;
       })
   }
 
   const handleLogout = () => {
     setUser(null);
-    let token = localStorage.getItem("refreshToken")
+    let token = getLocalRefreshToken();
     TokenBlackList(token)
     localStorage.clear()
     router.push('/login')

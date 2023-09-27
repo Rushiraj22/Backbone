@@ -1,10 +1,9 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FC, ReactNode } from "react";
 import { Drawer } from '@mui/material';
 import Icon from "src/@core/components/icon";
 import { styled } from "@mui/material/styles";
 import Box, { BoxProps } from "@mui/material/Box";
 import CustomTypography from '../typography/typography';
-import MUIButton from '../button/button';
 import MUIIconButton from '../iconButton/iconButton';
 
 interface DrawerComponentProps {
@@ -15,7 +14,7 @@ interface DrawerComponentProps {
     drawerBoxForm: any;
     anchor: string | any;
     variant: string | any;
-    sx: any;
+    sx?: any;
 }
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -42,7 +41,7 @@ const DrawerComponent: FC<DrawerComponentProps> = ({ open, onClose, anchor, vari
                 <MUIIconButton
                     icon={<Icon icon="mdi:close" fontSize={20} />}
                     onClick={onClose}
-                    />
+                />
             </Header>
             <CustomTypography variant="h4" sx={{ textAlign: "center", pt: 10 }}>
                 {title}

@@ -1,10 +1,12 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import authReducer from "../reducers/authReducer";
+import computerSoftwareTypeReducer from "../reducers/computerSoftwareTypeReducer";
 /**
  * Combine all reducers files
  */
 const rootReducer = combineReducers({
-    authReducerState: authReducer
+    authReducerState: authReducer,
+    computerSoftwareType: computerSoftwareTypeReducer
 });
 
 /**
