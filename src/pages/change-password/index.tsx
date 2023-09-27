@@ -22,15 +22,15 @@ import { AppDispatch } from "src/redux/app/Store";
 /**
  * Styled Components
  */
-const ForgotPasswordIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  padding: theme.spacing(20),
+const ChangePasswordIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
+  padding: theme.spacing(0),
   paddingRight: "0 !important",
   [theme.breakpoints.down("lg")]: {
-    padding: theme.spacing(10)
+    padding: theme.spacing(0)
   }
 }));
 
-const ForgotPasswordIllustration = styled("img")(({ theme }) => ({
+const ChangePasswordIllustration = styled("img")(({ theme }) => ({
   maxWidth: "48rem",
   [theme.breakpoints.down("xl")]: {
     maxWidth: "38rem",
@@ -207,12 +207,12 @@ const ForgotPassword = () => {
       {
         !hidden ? (
           <BoxComponent sx={{ flex: 1, display: "flex", position: "relative", alignItems: "center", justifyContent: "center" }}>
-            <ForgotPasswordIllustrationWrapper>
-              <ForgotPasswordIllustration
+            <ChangePasswordIllustrationWrapper>
+              <ChangePasswordIllustration
                 alt="forgot-password-illustration"
                 src={`/images/pages/${imageSource}-${theme.palette.mode}.png`}
               />
-            </ForgotPasswordIllustrationWrapper>
+            </ChangePasswordIllustrationWrapper>
             <FooterIllustrationsV2 image={`/images/pages/auth-v2-forgot-password-mask-${theme.palette.mode}.png`} />
           </BoxComponent>
         )

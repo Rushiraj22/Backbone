@@ -100,10 +100,8 @@ export const ChangePassword = createAsyncThunk(
             otp: formValues.inputValues.otp,
             new_password: formValues.inputValues.new_password
         };
-        console.log("parameters", parameters);
         try {
             const response = await axiosObj.put(getChangePasswordURL(), parameters);
-            console.log("response", response);
             if (response.data.code === 200) {
                 toast.success(response.data.message);
             } if (response.data.status === "failure") {
@@ -128,14 +126,11 @@ export const refreshToken = () => {
  * TokenBlackList API Call
  */
 export const TokenBlackList = async (token: any) => {
-    console.log("token", token);
     const parameters = {
         refresh: token
     };
-    console.log("parameters", parameters);
     try {
         const response = await axiosObj.post(getBlacklistTokenURL(), parameters);
-        console.log("response", response);
         if (response.status === 200) {
             Router.push("/login");
         }
