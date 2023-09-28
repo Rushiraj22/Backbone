@@ -1,4 +1,3 @@
-import Icon from "src/@core/components/icon";
 import MUIButton from "src/@core/components/libs/ui/button/button";
 import BoxComponent from "src/@core/components/libs/ui/muiBox/muiBox";
 import TextFieldComponent from "src/@core/components/libs/ui/textField/textField";
@@ -11,17 +10,13 @@ interface TableHeaderProps {
   title?: string;
   searchlabel?: string | any;
   buttonName?: string;
-  exportButtonTitle?: string;
-  change3PL?: any;
-  handleButtonClick?: any;
-  handlePrintLabelBtn?: any;
-  printLabel?: string | null | undefined;
-  showHeader?: boolean;
 }
 
 const TableHeader = (props: TableHeaderProps) => {
-  // ** Props
-  const { handleAdd, title, searchlabel, buttonName, exportButtonTitle, change3PL, handleButtonClick, handlePrintLabelBtn, printLabel, showHeader = true } = props;
+  /**
+   * Props
+   */
+  const { handleAdd, title, searchlabel, buttonName } = props;
 
   return (
     <BoxComponent>
@@ -31,68 +26,29 @@ const TableHeader = (props: TableHeaderProps) => {
         </MUIGrid>
       </MUIGrid>
       <MUIDivider />
-      {
-        showHeader &&
-        <BoxComponent sx={{ p: 5, pb: 3, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
-          <BoxComponent sx={{}}>
-            {exportButtonTitle &&
-              <MUIButton
-                sx={{ mr: 4, mb: 2 }}
-                color="secondary"
-                title={exportButtonTitle}
-                variant="outlined"
-                startIcon={<Icon icon="mdi:export-variant" fontSize={20} onClick={handleButtonClick} />}
-                onClick={handleButtonClick}
-              />
-            }
+      <BoxComponent sx={{ p: 5, pb: 3, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end" }}>
+        <BoxComponent sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <BoxComponent sx={{ width: "50%" }}>
+            <TextFieldComponent
+              label={searchlabel}
+              placeholder={searchlabel}
+              sx={{ mr: 6, mb: 2 }}
+              size="small"
+            />
           </BoxComponent>
-          <BoxComponent sx={{}}>
-            {change3PL ?
-              <MUIButton
-                sx={{ mr: 4, mb: 2 }}
-                color="primary"
-                title={change3PL}
-                variant="contained"
-                onClick={handleButtonClick}
-              />
-              : null
-            }
-          </BoxComponent>
-          <BoxComponent sx={{}}>
-            {printLabel ?
-              <MUIButton
-                sx={{ mr: 4, mb: 2 }}
-                color="primary"
-                title={printLabel}
-                variant="contained"
-                onClick={handlePrintLabelBtn}
-              />
-              : null
-            }
-          </BoxComponent>
-          <BoxComponent sx={{ display: "flex", justifyContent: "flex-end" }}>
+          {buttonName ?
             <BoxComponent sx={{ width: "50%" }}>
-              <TextFieldComponent
-                label={searchlabel}
-                placeholder={searchlabel}
-                sx={{ mr: 6, mb: 2 }}
-                size="small"
+              <MUIButton
+                variant="contained"
+                color="primary"
+                title={buttonName}
+                sx={{ mb: 2, float: "right" }}
+                onClick={handleAdd}
               />
-            </BoxComponent>
-            {buttonName ?
-              <BoxComponent sx={{ width: "50%" }}>
-                <MUIButton
-                  variant="contained"
-                  color="primary"
-                  title={buttonName}
-                  sx={{ mb: 2, float: "right" }}
-                  onClick={handleAdd}
-                />
-              </BoxComponent> : null
-            }
-          </BoxComponent>
+            </BoxComponent> : null
+          }
         </BoxComponent>
-      }
+      </BoxComponent>
     </BoxComponent>
   )
 }

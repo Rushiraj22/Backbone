@@ -1,16 +1,11 @@
-// ** React Imports
-import { createContext, useEffect, useState, ReactNode } from 'react'
-
-// ** Next Import
-import { useRouter } from 'next/router'
-
-// ** Config
-import authConfig from 'src/configs/auth'
-
-// ** Types
-import { AuthValuesType, LoginParams, ErrCallbackType, UserDataType } from './types'
-import axiosObj from 'src/services/api'
-import { getSignInURL } from 'src/services/apiConfig'
+import { createContext, useEffect, useState, ReactNode } from "react";
+import { useRouter } from "next/router";
+import authConfig from "src/configs/auth";
+import { AuthValuesType, LoginParams, UserDataType } from "./types";
+import axiosObj from "src/services/api";
+import { getSignInURL } from "src/services/apiConfig";
+import { TokenBlackList } from "src/redux/reducers/authReducer";
+import { getAccessToken, getLocalRefreshToken, saveAccessToken, saveRefreshToken } from "src/utils/helper";
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -29,17 +24,20 @@ type Props = {
 }
 
 const AuthProvider = ({ children }: Props) => {
-  // ** States
+  /**
+   * States
+   */
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
-  console.log("user", user);
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
 
-  // ** Hooks
+  /**
+   * Hooks
+   */
   const router = useRouter()
 
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
-      const storedToken = window.localStorage.getItem("accessToken")
+      const storedToken = getAccessToken()
       if (storedToken) {
         setLoading(true)
         setLoading(false)
@@ -47,7 +45,7 @@ const AuthProvider = ({ children }: Props) => {
         const roles = userData ? userData : null;
         setUser(roles)
       } else {
-        const myaccessToken = window.localStorage.getItem("accessToken")
+        const myaccessToken = getAccessToken();
         setLoading(false)
         if (!myaccessToken) {
           router.replace("/login")
@@ -62,10 +60,9 @@ const AuthProvider = ({ children }: Props) => {
   const handleLogin = async (params: LoginParams) => {
     axiosObj.post(getSignInURL(), params)
       .then(async response => {
-        console.log("response", response);
         if (response.status === 200) {
-          localStorage.setItem("accessToken", response.data.access);
-          localStorage.setItem("refreshToken", response.data.refresh);
+          saveAccessToken("accessToken", response.data.access);
+          saveRefreshToken("refreshToken", response.data.refresh)
           localStorage.setItem("userData", "admin");
           localStorage.setItem("user_permissions", response.data.user_permissions)
           const userData = window.localStorage.getItem("userData");
@@ -77,12 +74,14 @@ const AuthProvider = ({ children }: Props) => {
         }
       })
       .catch(err => {
-        console.log(err);
+        throw err;
       })
   }
 
   const handleLogout = () => {
-    setUser(null)
+    setUser(null);
+    let token = getLocalRefreshToken();
+    TokenBlackList(token)
     localStorage.clear()
     router.push('/login')
   }
